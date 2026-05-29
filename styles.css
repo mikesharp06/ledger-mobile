@@ -60,9 +60,9 @@ input { font-family: inherit; }
 }
 .brand { display: flex; align-items: center; gap: 9px; }
 .brand-mark {
-  width: 22px; height: 22px; border-radius: 6px;
-  background: url("icons/favicon-64.png") center/cover no-repeat var(--tan);
-  border: 1px solid var(--tan-line);
+  width: 40px; height: 40px;
+  background: url("icons/ledger_cat_title.png") center/contain no-repeat var(--paper);
+  image-rendering: pixelated;
 }
 .brand-name { font-weight: 600; letter-spacing: .2px; font-size: 1.02rem; }
 

@@ -263,7 +263,6 @@
   // ---------- Settings ----------
   function openSettings() {
     renderCatEditor();
-    renderStorageStatus();
     showOverlay("settingsOverlay");
   }
 
@@ -279,25 +278,6 @@
       await navigator.storage.persist();
     } catch (e) {
       console.warn("Persistent storage request failed:", e);
-    }
-  }
-
-  async function renderStorageStatus() {
-    const el = $("storageStatus");
-    if (!el) return;
-    if (!navigator.storage || !navigator.storage.persisted) {
-      el.hidden = true;
-      return;
-    }
-    try {
-      const persisted = await navigator.storage.persisted();
-      el.hidden = false;
-      el.classList.toggle("ok", persisted);
-      el.textContent = persisted
-        ? "Storage: protected — the browser won't auto-clear this app's data."
-        : "Storage: best-effort — the browser may clear data if space runs low or the app sits unused. Keep a backup.";
-    } catch (e) {
-      el.hidden = true;
     }
   }
 
