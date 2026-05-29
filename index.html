@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f7f3ec" />
+  <title>Ledger — simple budgeting</title>
+  <meta name="description" content="A simple, private budget tracker. Your data stays on your device." />
+
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="icon" href="icons/favicon-64.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Ledger" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">Ledger</span>
+    </div>
+    <button id="settingsBtn" class="icon-btn" aria-label="Settings" title="Settings">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </button>
+  </header>
+
+  <main class="app">
+    <!-- Month + balance -->
+    <section class="summary" aria-label="Monthly summary">
+      <div class="month-nav">
+        <button id="prevMonth" class="icon-btn ghost" aria-label="Previous month">‹</button>
+        <h1 id="monthLabel" class="month-label">—</h1>
+        <button id="nextMonth" class="icon-btn ghost" aria-label="Next month">›</button>
+      </div>
+
+      <div class="balance">
+        <span class="balance-caption">Net this month</span>
+        <span id="netBalance" class="balance-amount">—</span>
+      </div>
+
+      <div class="totals">
+        <div class="total in">
+          <span class="total-label">In</span>
+          <span id="totalIncome" class="total-value">—</span>
+        </div>
+        <div class="total out">
+          <span class="total-label">Out</span>
+          <span id="totalExpense" class="total-value">—</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Spending by category -->
+    <section id="breakdownSection" class="breakdown" aria-label="Spending by category" hidden>
+      <h2 class="section-title">Where it went</h2>
+      <ul id="breakdownList" class="breakdown-list"></ul>
+    </section>
+
+    <!-- Transactions -->
+    <section class="transactions" aria-label="Transactions">
+      <h2 class="section-title">Activity</h2>
+      <div id="txList" class="tx-list"></div>
+      <div id="emptyState" class="empty" hidden>
+        <p class="empty-title">Nothing logged yet</p>
+        <p class="empty-sub">Tap the + button to add your first entry.</p>
+      </div>
+    </section>
+  </main>
+
+  <button id="addBtn" class="fab" aria-label="Add transaction">
+    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+  </button>
+
+  <!-- Add / edit sheet -->
+  <div id="sheetOverlay" class="overlay" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="sheet-head">
+        <h2 id="sheetTitle" class="sheet-title">New entry</h2>
+        <button id="sheetClose" class="icon-btn ghost" aria-label="Close">✕</button>
+      </div>
+
+      <div class="type-toggle" role="group" aria-label="Entry type">
+        <button type="button" id="typeExpense" class="seg active" data-type="expense">Expense</button>
+        <button type="button" id="typeIncome" class="seg" data-type="income">Income</button>
+      </div>
+
+      <label class="field amount-field">
+        <span class="field-label">Amount</span>
+        <div class="amount-input">
+          <span class="cur-glyph">$</span>
+          <input id="amountInput" type="text" inputmode="decimal" placeholder="0.00" autocomplete="off" />
+        </div>
+      </label>
+
+      <div class="field">
+        <span class="field-label">Category</span>
+        <div id="categoryChips" class="chips"></div>
+      </div>
+
+      <div class="field-row">
+        <label class="field">
+          <span class="field-label">Date</span>
+          <input id="dateInput" type="date" />
+        </label>
+      </div>
+
+      <label class="field">
+        <span class="field-label">Note <span class="opt">(optional)</span></span>
+        <input id="noteInput" type="text" maxlength="120" placeholder="e.g. groceries at the co-op" autocomplete="off" />
+      </label>
+
+      <div class="sheet-actions">
+        <button id="deleteBtn" class="btn danger" hidden>Delete</button>
+        <button id="saveBtn" class="btn primary">Save entry</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings sheet -->
+  <div id="settingsOverlay" class="overlay" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="sheet-head">
+        <h2 id="settingsTitle" class="sheet-title">Settings</h2>
+        <button id="settingsClose" class="icon-btn ghost" aria-label="Close">✕</button>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Categories</span>
+        <div class="cat-editor">
+          <div class="cat-group">
+            <span class="cat-group-label out">Expense</span>
+            <div id="expenseCats" class="cat-tags"></div>
+            <div class="cat-add">
+              <input id="newExpenseCat" type="text" placeholder="Add expense category" maxlength="24" />
+              <button id="addExpenseCat" class="btn small">Add</button>
+            </div>
+          </div>
+          <div class="cat-group">
+            <span class="cat-group-label in">Income</span>
+            <div id="incomeCats" class="cat-tags"></div>
+            <div class="cat-add">
+              <input id="newIncomeCat" type="text" placeholder="Add income category" maxlength="24" />
+              <button id="addIncomeCat" class="btn small">Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Your data</span>
+        <p class="hint">Everything is stored only on this device. Back it up regularly.</p>
+        <div class="data-actions">
+          <button id="exportJson" class="btn">Export backup (.json)</button>
+          <button id="exportCsv" class="btn">Export spreadsheet (.csv)</button>
+          <button id="importBtn" class="btn">Restore from backup</button>
+          <input id="importFile" type="file" accept="application/json,.json" hidden />
+        </div>
+        <button id="clearData" class="btn danger ghost-danger">Erase all data</button>
+      </div>
+
+      <p class="version">Ledger · stored locally · works offline</p>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
