@@ -263,7 +263,42 @@
   // ---------- Settings ----------
   function openSettings() {
     renderCatEditor();
+    renderStorageStatus();
     showOverlay("settingsOverlay");
+  }
+
+  // ---------- Storage durability ----------
+  // Ask the browser not to auto-evict our data (iOS ~7-day cleanup, low-disk
+  // pressure). It's a request, not a guarantee — we surface the real result in
+  // Settings so the user is never falsely reassured. Never touches stored data.
+  async function requestPersistentStorage() {
+    try {
+      if (!navigator.storage || !navigator.storage.persist) return;
+      // Don't re-prompt if already granted.
+      if (await navigator.storage.persisted()) return;
+      await navigator.storage.persist();
+    } catch (e) {
+      console.warn("Persistent storage request failed:", e);
+    }
+  }
+
+  async function renderStorageStatus() {
+    const el = $("storageStatus");
+    if (!el) return;
+    if (!navigator.storage || !navigator.storage.persisted) {
+      el.hidden = true;
+      return;
+    }
+    try {
+      const persisted = await navigator.storage.persisted();
+      el.hidden = false;
+      el.classList.toggle("ok", persisted);
+      el.textContent = persisted
+        ? "Storage: protected — the browser won't auto-clear this app's data."
+        : "Storage: best-effort — the browser may clear data if space runs low or the app sits unused. Keep a backup.";
+    } catch (e) {
+      el.hidden = true;
+    }
   }
 
   function renderCatEditor() {
@@ -422,6 +457,7 @@
 
   bind();
   render();
+  requestPersistentStorage();
 
   // ---------- PWA service worker ----------
   if ("serviceWorker" in navigator) {

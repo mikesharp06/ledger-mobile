@@ -292,6 +292,10 @@ input[type="text"]:focus, input[type="date"]:focus { outline: none; border-color
 /* settings */
 .hint, .data-actions, .cat-editor { margin-top: 0; }
 .hint { font-size: .85rem; color: var(--muted); margin: -2px 0 12px; }
+.storage-status { display: flex; gap: 6px; }
+.storage-status::before { content: "●"; color: var(--amber); }
+.storage-status.ok { color: var(--ink-soft); }
+.storage-status.ok::before { content: "✓"; color: var(--green); }
 .data-actions { display: flex; flex-direction: column; gap: 10px; }
 .cat-editor { display: flex; flex-direction: column; gap: 22px; }
 .cat-group-label { font-size: .72rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
