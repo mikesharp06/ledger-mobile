@@ -1,6 +1,6 @@
 {
-  "name": "Ledger — Budget Tracker",
-  "short_name": "Ledger",
+  "name": "Ledger Cat — Budget Tracker",
+  "short_name": "Ledger Cat",
   "description": "A simple, private budget tracker. Your data stays on your device.",
   "start_url": ".",
   "scope": ".",

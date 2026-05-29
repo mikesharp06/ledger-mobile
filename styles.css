@@ -60,12 +60,8 @@ input { font-family: inherit; }
 }
 .brand { display: flex; align-items: center; gap: 9px; }
 .brand-mark {
-  width: 17px; height: 17px; border-radius: 5px;
-  background:
-    linear-gradient(var(--green) 0 0) 2px 4px/3px 9px no-repeat,
-    linear-gradient(var(--clay) 0 0) 7px 1px/3px 12px no-repeat,
-    linear-gradient(var(--green) 0 0) 12px 6px/3px 7px no-repeat,
-    var(--tan);
+  width: 22px; height: 22px; border-radius: 6px;
+  background: url("icons/favicon-64.png") center/cover no-repeat var(--tan);
   border: 1px solid var(--tan-line);
 }
 .brand-name { font-weight: 600; letter-spacing: .2px; font-size: 1.02rem; }

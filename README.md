@@ -1,4 +1,4 @@
-# Ledger — a free, private budget tracker
+# Ledger Cat — a free, private budget tracker
 
 A mobile-first budgeting web app (PWA) that stores all data **locally on each
 person's device**. No server, no database, no accounts — so it costs nothing to

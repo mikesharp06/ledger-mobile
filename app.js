@@ -362,7 +362,7 @@
         toast("Backup restored.");
         closeOverlay("settingsOverlay");
       } catch (e) {
-        toast("That file isn't a valid Ledger backup.");
+        toast("That file isn't a valid Ledger Cat backup.");
         console.error(e);
       }
     };

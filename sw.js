@@ -2,7 +2,7 @@
    App-shell uses network-first, so deploys are picked up automatically when
    online; the cache is the offline fallback. CACHE is only bumped to retire
    stale entries — content freshness no longer depends on it. */
-const CACHE = "ledger-v5";
+const CACHE = "ledger-v6";
 const ASSETS = [
   "./",
   "./index.html",
