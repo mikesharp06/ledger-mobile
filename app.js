@@ -352,6 +352,36 @@
   }
 
   // ---------- Wire up ----------
+  function changeMonth(delta) {
+    viewMonth = new Date(viewMonth.getFullYear(), viewMonth.getMonth() + delta, 1);
+    render();
+  }
+
+  // Horizontal swipe on `el` changes month: swipe left → next, right → previous.
+  // Ignores vertical drags so the page can still scroll normally.
+  function bindMonthSwipe(el) {
+    if (!el) return;
+    const MIN_X = 45;   // minimum horizontal travel to count as a swipe
+    let startX = 0, startY = 0, tracking = false;
+
+    el.addEventListener("touchstart", (e) => {
+      if (e.touches.length !== 1) { tracking = false; return; }
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      tracking = true;
+    }, { passive: true });
+
+    el.addEventListener("touchend", (e) => {
+      if (!tracking) return;
+      tracking = false;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - startX;
+      const dy = t.clientY - startY;
+      if (Math.abs(dx) < MIN_X || Math.abs(dx) <= Math.abs(dy)) return; // not a horizontal swipe
+      changeMonth(dx < 0 ? 1 : -1);
+    }, { passive: true });
+  }
+
   function bind() {
     $("addBtn").addEventListener("click", () => openSheet(null));
     $("sheetClose").addEventListener("click", () => closeOverlay("sheetOverlay"));
@@ -373,9 +403,12 @@
     $("importFile").addEventListener("change", (e) => { if (e.target.files[0]) importJson(e.target.files[0]); e.target.value = ""; });
     $("clearData").addEventListener("click", clearData);
 
-    $("prevMonth").addEventListener("click", () => { viewMonth = new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1); render(); });
-    $("nextMonth").addEventListener("click", () => { viewMonth = new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1); render(); });
+    $("prevMonth").addEventListener("click", () => changeMonth(-1));
+    $("nextMonth").addEventListener("click", () => changeMonth(1));
     $("monthLabel").addEventListener("click", () => { viewMonth = startOfMonth(new Date()); render(); });
+
+    // Swipe the summary card left/right to change months.
+    bindMonthSwipe($("summaryCard"));
 
     // tap backdrop to dismiss
     document.querySelectorAll(".overlay").forEach((ov) => {

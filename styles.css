@@ -36,6 +36,9 @@ body {
   -webkit-font-smoothing: antialiased;
   min-height: 100dvh;
   overflow-x: hidden;
+  /* Disable double-tap-to-zoom (keeps pinch-zoom & scrolling) so fast,
+     repeated taps on buttons register as taps, not a zoom gesture. */
+  touch-action: manipulation;
 }
 
 /* Subtle paper grain */
@@ -72,7 +75,7 @@ input { font-family: inherit; }
   border-radius: 11px; color: var(--ink-soft);
   transition: background .15s, color .15s, transform .1s;
 }
-.icon-btn:hover { background: var(--tan); }
+@media (hover: hover) { .icon-btn:hover { background: var(--tan); } }
 .icon-btn:active { transform: scale(.94); }
 .icon-btn.ghost { width: 36px; height: 36px; font-size: 1.5rem; line-height: 1; color: var(--muted); }
 
@@ -185,7 +188,7 @@ input { font-family: inherit; }
   box-shadow: 0 10px 28px rgba(31,27,22,.32);
   transition: transform .14s, box-shadow .14s;
 }
-.fab:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(31,27,22,.38); }
+@media (hover: hover) { .fab:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(31,27,22,.38); } }
 .fab:active { transform: scale(.93); }
 
 /* ---------- Sheets / overlays ---------- */
@@ -301,7 +304,7 @@ input[type="text"]:focus, input[type="date"]:focus { outline: none; border-color
   background: var(--paper); border: 1px solid var(--tan-line);
 }
 .cat-tag button { color: var(--muted); font-size: 1.05rem; line-height: 1; padding: 0 2px; }
-.cat-tag button:hover { color: var(--clay); }
+@media (hover: hover) { .cat-tag button:hover { color: var(--clay); } }
 .cat-add { display: flex; gap: 8px; }
 .cat-add input { flex: 1; }
 
