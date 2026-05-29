@@ -233,7 +233,7 @@ input { font-family: inherit; }
 .field-label .opt { text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--tan-line); }
 
 input[type="text"], input[type="date"] {
-  width: 100%; padding: 13px 14px; border-radius: var(--r-sm);
+  width: 80%; padding: 13px 14px; border-radius: var(--r-sm);
   border: 1.5px solid var(--tan-line); background: var(--paper-2);
   font-size: 1rem; color: var(--ink); transition: border-color .15s;
 }
