@@ -1,6 +1,8 @@
 /* Ledger service worker — offline app shell.
-   Bump CACHE when you change any cached file to force an update. */
-const CACHE = "ledger-v4";
+   App-shell uses network-first, so deploys are picked up automatically when
+   online; the cache is the offline fallback. CACHE is only bumped to retire
+   stale entries — content freshness no longer depends on it. */
+const CACHE = "ledger-v5";
 const ASSETS = [
   "./",
   "./index.html",
@@ -31,16 +33,16 @@ self.addEventListener("fetch", (e) => {
   if (req.method !== "GET") return;
   const url = new URL(req.url);
 
-  // App-shell + same-origin: cache-first, fall back to network and cache it.
+  // App-shell + same-origin: network-first so updates are picked up
+  // automatically when online; fall back to cache (then index.html) offline.
   if (url.origin === location.origin) {
     e.respondWith(
-      caches.match(req).then((hit) =>
-        hit ||
-        fetch(req).then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(req, copy));
-          return res;
-        }).catch(() => caches.match("./index.html"))
+      fetch(req).then((res) => {
+        const copy = res.clone();
+        caches.open(CACHE).then((c) => c.put(req, copy));
+        return res;
+      }).catch(() =>
+        caches.match(req).then((hit) => hit || caches.match("./index.html"))
       )
     );
     return;

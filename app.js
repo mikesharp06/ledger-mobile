@@ -310,16 +310,6 @@
     toast("Backup downloaded.");
   }
 
-  function exportCsv() {
-    const head = ["date", "type", "category", "amount", "note"];
-    const rows = [...state.transactions]
-      .sort((a, b) => (a.date < b.date ? -1 : 1))
-      .map((t) => [t.date, t.type, t.category, t.amount.toFixed(2), t.note || ""]
-        .map((f) => `"${String(f).replace(/"/g, '""')}"`).join(","));
-    download(`ledger-${todayISO()}.csv`, [head.join(","), ...rows].join("\n"), "text/csv");
-    toast("CSV downloaded.");
-  }
-
   function importJson(file) {
     const reader = new FileReader();
     reader.onload = () => {
@@ -379,7 +369,6 @@
     $("newIncomeCat").addEventListener("keydown", (e) => { if (e.key === "Enter") $("addIncomeCat").click(); });
 
     $("exportJson").addEventListener("click", exportJson);
-    $("exportCsv").addEventListener("click", exportCsv);
     $("importBtn").addEventListener("click", () => $("importFile").click());
     $("importFile").addEventListener("change", (e) => { if (e.target.files[0]) importJson(e.target.files[0]); e.target.value = ""; });
     $("clearData").addEventListener("click", clearData);
@@ -403,8 +392,24 @@
 
   // ---------- PWA service worker ----------
   if ("serviceWorker" in navigator) {
+    // If an updated worker takes control of an already-controlled page, the
+    // app shell has changed — reload once so the user sees the new version.
+    const hadController = !!navigator.serviceWorker.controller;
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (refreshing || !hadController) return;
+      refreshing = true;
+      window.location.reload();
+    });
+
     window.addEventListener("load", () => {
-      navigator.serviceWorker.register("sw.js").catch((e) => console.warn("SW registration failed:", e));
+      navigator.serviceWorker.register("sw.js").then((reg) => {
+        // Re-check for a new version whenever the app is brought to the
+        // foreground (e.g. a home-screen PWA resumed from the background).
+        document.addEventListener("visibilitychange", () => {
+          if (document.visibilityState === "visible") reg.update();
+        });
+      }).catch((e) => console.warn("SW registration failed:", e));
     });
   }
 })();
